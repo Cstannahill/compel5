@@ -1,34 +1,76 @@
+[build-system]
+requires = ["setuptools>=77.0.3", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "compel5"
-version = "2.4.0"
-authors = [
-  { name="Damian Stewart", email="null@damianstewart.com" },
-]
-description = "A prompting enhancement library for transformers-type text embedding systems."
+version = "0.1.0"
+description = "A maintained fork of Compel for modern Diffusers and Transformers versions."
 readme = "README.md"
 requires-python = ">=3.10"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "Programming Language :: Python :: 3.12",
-    "Programming Language :: Python :: 3.13",
-    "License :: OSI Approved :: MIT License",
-    "Operating System :: OS Independent",
+
+authors = [
+  { name = "Damian Stewart" }
 ]
+
+maintainers = [
+  { name = "Christian Tannahill" }
+]
+
+keywords = [
+  "diffusers",
+  "transformers",
+  "stable-diffusion",
+  "sdxl",
+  "prompt-weighting",
+  "text-embeddings"
+]
+
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Intended Audience :: Developers",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+]
+
 dependencies = [
-    "diffusers >= 0.11",
-    "notebook>=6.5.7",
-    "pyparsing ~= 3.0",
-    "torch",
-    "transformers >= 5, < 6",
+  "torch",
+  "transformers>=5,<6",
+  "diffusers>=0.35",
+  "pyparsing>=3,<4",
+]
+
+[project.optional-dependencies]
+dev = [
+  "build",
+  "pytest",
+  "ruff",
+  "twine",
+]
+examples = [
+  "notebook>=6.5.7",
 ]
 
 [project.urls]
-"Homepage" = "https://github.com/damian0815/compel"
-"Bug Tracker" = "https://github.com/damian0815/compel/issues"
+Homepage = "https://github.com/Cstannahill/compel5"
+Repository = "https://github.com/Cstannahill/compel5.git"
+Issues = "https://github.com/Cstannahill/compel5/issues"
+Changelog = "https://github.com/Cstannahill/compel5/releases"
 
-[build-system]
-requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_meta"
+[tool.setuptools]
+package-dir = {"" = "src"}
+include-package-data = true
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["test"]

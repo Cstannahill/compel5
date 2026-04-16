@@ -1,9 +1,10 @@
 # Compel
+
 A text prompt weighting and blending library for transformers-type text embedding systems, by [@damian0815](https://github.com/damian0815).
 
 With a flexible and intuitive syntax, you can re-weight different parts of a prompt string and thus re-weight the different parts of the embedding tensor produced from the string.
 
-Tested and developed against Hugging Face's `StableDiffusionPipeline` but it should work with any diffusers-based system that uses an `Tokenizer` and a `Text Encoder` of some kind.  
+Tested and developed against Hugging Face's `StableDiffusionPipeline` but it should work with any diffusers-based system that uses an `Tokenizer` and a `Text Encoder` of some kind.
 
 Adapted from the [InvokeAI](https://github.com/invoke-ai) prompting code (also by [@damian0815](https://github.com/damian0815)).
 
@@ -11,7 +12,7 @@ Note that cross-attention control `.swap()` is currently ignored by Compel, but 
 
 ## Installation
 
-`pip install compel`
+`pip install compel5`
 
 Current main-branch support targets:
 
@@ -25,10 +26,6 @@ Documentation is [here](doc/).
 ## Demo
 
 See [compel-demo.ipynb](compel-demo.ipynb)
-
-<a target="_blank" href="https://colab.research.google.com/github/damian0815/compel/blob/main/compel-demo.ipynb">
-  <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Open In Colab"/>
-</a>
 
 ## Quickstart
 
@@ -79,7 +76,7 @@ pipeline = StableDiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1
 compel = CompelForSD(pipeline)
 
 prompt = ["a cat playing with a ball++ in the forest", "a dog wearing a hat++"]
-negative_prompt = ["blurry, low quality, deformed", "painting"] 
+negative_prompt = ["blurry, low quality, deformed", "painting"]
 # or: negative_prompt = "blurry, low quality, deformed" # shared across all generated images
 conditioning = compel(prompt, negative_prompt=negative_prompt)
 
@@ -96,7 +93,7 @@ from compel import CompelForSDXL
 import torch
 
 device = 'cuda'
-pipeline = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", variant="fp16", 
+pipeline = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", variant="fp16",
                                              use_safetensors=True, torch_dtype=torch.float16).to(device)
 
 prompt = "a cat playing with a ball++ in the forest"
@@ -105,7 +102,7 @@ compel = CompelForSDXL(pipeline)
 conditioning = compel(prompt, negative_prompt=negative_prompt)
 
 generator = torch.Generator().manual_seed(42)
-image = pipeline(prompt_embeds=conditioning.embeds, 
+image = pipeline(prompt_embeds=conditioning.embeds,
                  pooled_prompt_embeds=conditioning.pooled_embeds,
                  negative_prompt_embeds=conditioning.negative_embeds,
                  negative_pooled_prompt_embeds=conditioning.negative_pooled_embeds,
@@ -142,7 +139,7 @@ from compel import CompelForSDXL
 import torch
 
 device = 'cuda'
-pipeline = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", variant="fp16", 
+pipeline = DiffusionPipeline.from_pretrained("stabilityai/stable-diffusion-xl-base-1.0", variant="fp16",
                                              use_safetensors=True, torch_dtype=torch.float16).to(device)
 
 prompt = "a cat playing with a ball++ in the forest"
@@ -150,11 +147,11 @@ style_prompt = "painting by van gogh, impasto, thick brush strokes"
 negative_prompt = "low quality, blurry"
 negative_style_prompt = "photography"
 compel = CompelForSDXL(pipeline) # or CompelForFlux
-conditioning = compel(prompt=prompt, negative_prompt=negative_prompt, 
+conditioning = compel(prompt=prompt, negative_prompt=negative_prompt,
                       style_prompt=style_prompt, negative_style_prompt=negative_style_prompt)
 
 generator = torch.Generator().manual_seed(42)
-image = pipeline(prompt_embeds=conditioning.embeds, 
+image = pipeline(prompt_embeds=conditioning.embeds,
                  pooled_prompt_embeds=conditioning.pooled_embeds,
                  negative_prompt_embeds=conditioning.negative_embeds,
                  negative_pooled_prompt_embeds=conditioning.negative_pooled_embeds,
@@ -176,9 +173,10 @@ compel = CompelForSD(pipe=pipeline, textual_inversion_manager=textual_inversion_
 
 ## Memory usage/VRAM leaks
 
-If you run into memory issues, please make sure you're running compel inside `with torch.no_grad():` blocks. 
+If you run into memory issues, please make sure you're running compel inside `with torch.no_grad():` blocks.
 
-If this doesn't help, you could try this advice offered by @kshieh1: 
+If this doesn't help, you could try this advice offered by @kshieh1:
+
 > After image generation, you should explictly de-reference the tensor object (i.e., prompt_embeds = None) and call gc.collect()
 
 See https://github.com/damian0815/compel/issues/24 for more details. Thanks @kshieh1 !
@@ -205,32 +203,32 @@ Current main-branch validation also includes opt-in local SDXL `.safetensors` si
 
 ### 2.3.0 - Tokenization info, SplitLongTextMode CLS token handling, negative/style bugfixes
 
-* `CompelFor*` objects now return tokenization info via `conditioning.tokenization_info` dict, which contains keys for `main_positive` and (where appropriate) `main_negative`, `style_positive` and `style_negative`.
-* `SplitLongTextMode` enum has additional options for handling the CLS (EOS) token - either the CLS token can be copied from the first chunk to subsequent chunks, or all CLS tokens can be merged and the merge duplicated on all chunks. See `SplitLongTextMode` enum for details.
-* Misc edge case fixes for handling different combinations of style prompts and negative prompts with SDXL/Flux
+- `CompelFor*` objects now return tokenization info via `conditioning.tokenization_info` dict, which contains keys for `main_positive` and (where appropriate) `main_negative`, `style_positive` and `style_negative`.
+- `SplitLongTextMode` enum has additional options for handling the CLS (EOS) token - either the CLS token can be copied from the first chunk to subsequent chunks, or all CLS tokens can be merged and the merge duplicated on all chunks. See `SplitLongTextMode` enum for details.
+- Misc edge case fixes for handling different combinations of style prompts and negative prompts with SDXL/Flux
 
 #### 2.2.1 - fix for #116
 
 ### 2.2.0 - Flux support, usability improvement
 
-* Flux is now supported
-* Added `CompelForSD`, `CompelForFlux` and `CompelForSDXL` to simplify and streamline embeds vs pooled_embeds, negative prompts, and style prompts handling. See compel-demo-*.py/.ipynb for usage examples.
-* Performance improvements when working with non-weighted prompts. If a prompt is passed with no weighting, the weighting logic is completely bypassed. **This may slightly change the outputs when no weighting is applied** - revert to the old slower behaviour by calling `compel.disable_no_weights_bypass()`.
-* When working with `CompelForSD` and `CompelForSDXL` classes, non-truncation is now the default.
+- Flux is now supported
+- Added `CompelForSD`, `CompelForFlux` and `CompelForSDXL` to simplify and streamline embeds vs pooled_embeds, negative prompts, and style prompts handling. See compel-demo-\*.py/.ipynb for usage examples.
+- Performance improvements when working with non-weighted prompts. If a prompt is passed with no weighting, the weighting logic is completely bypassed. **This may slightly change the outputs when no weighting is applied** - revert to the old slower behaviour by calling `compel.disable_no_weights_bypass()`.
+- When working with `CompelForSD` and `CompelForSDXL` classes, non-truncation is now the default.
 
 #### 2.1.1 - expose `split_long_text_mode` to top-level Compel, default to `SENTENCES`, fix bug where splitting would fail sometimes.
 
-### 2.1.0 - add `split_long_text_mode` arg to control word splitting for long prompts when `truncate_long_prompts` is False. See `SplitLongTextMode`. Defaults to `WORDS`. 
+### 2.1.0 - add `split_long_text_mode` arg to control word splitting for long prompts when `truncate_long_prompts` is False. See `SplitLongTextMode`. Defaults to `WORDS`.
 
 #### 2.0.3 - include contributed fixes #64, #80 and fix license in pyproject.toml/pypi
 
 #### 2.0.2 - fix for `pipeline.enable_sequential_cpu_offloading()` with SDXL models (you need to pass `device='cuda'` on compel init)
 
-#### 2.0.1 - fix for [#45](https://github.com/damian0815/compel/issues/45) padding issue with SDXL non-truncated prompts and `.and()` 
+#### 2.0.1 - fix for [#45](https://github.com/damian0815/compel/issues/45) padding issue with SDXL non-truncated prompts and `.and()`
 
 ### 2.0.0 - SDXL Support
 
-With big thanks to Patrick von Platen from Hugging Face for [the pull request](https://github.com/damian0815/compel/pull/41), Compel now supports SDXL. Use it like this: 
+With big thanks to Patrick von Platen from Hugging Face for [the pull request](https://github.com/damian0815/compel/pull/41), Compel now supports SDXL. Use it like this:
 
 ```py
 from compel import Compel, ReturnedEmbeddingsType
@@ -248,14 +246,13 @@ image = pipeline(prompt_embeds=conditioning, pooled_prompt_embeds=pooled, num_in
 
 Please note that this is a **breaking change** if you've been using clip skip: the old boolean arg `use_penultimate_clip_layer` has been replaced with an enum `ReturnedEmbeddingsType.PENULTIMATE_HIDDEN_STATES_NORMALIZED`.
 
-
 #### 1.2.1 - actually apply `.and()` weights
 
 ### 1.2.0 - Concatenate embeddings using `.and()`
 
 For Stable Diffusion 2.1 I've been experimenting with a new feature: concatenated embeddings. What I noticed, for example, is that for more complex prompts image generation quality becomes wildly better when the prompt is broken into multiple parts and fed to OpenCLIP separately.
 
-TL;DR: you can now experiment with breaking up your prompts into segments, which for SD2.1 appears to improve the generated image. The syntax is `("prompt part 1", "prompt part 2").and()`. You can have more than one part, and you can also weight them, eg `("a man eating an apple", "sitting on the roof of a car", "high quality, trending on artstation, 8K UHD").and(1, 0.5, 0.5)` which will assign weight `1` to `man eating an apple` and `0.5` to `sitting on the roof of a car` and `high quality, trending on artstation, 8K UHD`. 
+TL;DR: you can now experiment with breaking up your prompts into segments, which for SD2.1 appears to improve the generated image. The syntax is `("prompt part 1", "prompt part 2").and()`. You can have more than one part, and you can also weight them, eg `("a man eating an apple", "sitting on the roof of a car", "high quality, trending on artstation, 8K UHD").and(1, 0.5, 0.5)` which will assign weight `1` to `man eating an apple` and `0.5` to `sitting on the roof of a car` and `high quality, trending on artstation, 8K UHD`.
 
 Here's a nonsense example from the InvokeAI discord #garbage-bin channel, created by gogurt enjoyer's incredible [nightmare prompt generator](https://huggingface.co/cactusfriend/nightmare-invokeai-prompts):
 
@@ -278,45 +275,49 @@ Wario's Woods in background
 making a noise like ga-woink-a
 ```
 
-then output image with the same seed is *so much* better:
+then output image with the same seed is _so much_ better:
 ![](images/000076.68b1c320.466129594.png)
 
 In the new `.and()` syntax you would prompt this as follows:
+
 ```
 ("a moist sloppy pindlesackboy sloppy hamblin' bogomadong", "Clem Fandango is pissed-off", "Wario's Woods in background", "making a noise like ga-woink-a").and()
 ```
 
-The effect can be more or less subtle. Here for example is 
+The effect can be more or less subtle. Here for example is
+
 ```
 A dream of a distant galaxy, by Caspar David Friedrich, matte painting, trending on artstation, HQ
 ```
+
 ![](images/000129.1b33b559.2793529321.png)
 
 And the same split into two parts:
+
 ```
 A dream of a distant galaxy, by Caspar David Friedrich, matte painting
 
 trending on artstation, HQ
 ```
+
 ![](images/000128.b5d5cd62.2793529321.png)
 
-The Compel prompt for this is: 
+The Compel prompt for this is:
+
 ```
 ("A dream of a distant galaxy, by Caspar David Friedrich, matte painting", "trending on artstation, HQ").and()
 ```
 
-
-
-
 #### 1.1.6 - misc small fixes
+
 - add `DiffusersTextualInversionManager` (thanks @pdoane)
 - fix batch embedding generation with truncated/non-truncated prompt lengths (#18, thanks @abassino)
-- add note about memory leakage (ref #24, thanks @kshieh1) 
+- add note about memory leakage (ref #24, thanks @kshieh1)
 - fix incorrect parsing when commas are not followed by whitespace (#34, thanks @moono)
 
 #### 1.1.5 - fix for compel turning numbers into floats for text inside parentheses
 
-#### 1.1.4 - fixes for #23 (sequential offload) and InvokeAI issue #3442 (allow hyphens in LoRA names) 
+#### 1.1.4 - fixes for #23 (sequential offload) and InvokeAI issue #3442 (allow hyphens in LoRA names)
 
 #### 1.1.3 - enable fetching the penultimate CLIP hidden layer (aka "clip skip")
 
@@ -328,14 +329,14 @@ To use, pass `use_penultimate_clip_layer=True` when initializing your `Compel` i
 
 #### 1.1.0 - support for parsing `withLora`/`useLora` on `parse_prompt_string()`.
 
-* `Compel.parse_prompt_string()` now returns a `Conjunction`
-* any appearances of `withLora(name[, weight])` or `useLora(name[, weight])` anywhere in the prompt string will be parsed to `LoraWeight` instances, and returned on the outermost `Conjunction` returned by `parse_prompt_string()`.
+- `Compel.parse_prompt_string()` now returns a `Conjunction`
+- any appearances of `withLora(name[, weight])` or `useLora(name[, weight])` anywhere in the prompt string will be parsed to `LoraWeight` instances, and returned on the outermost `Conjunction` returned by `parse_prompt_string()`.
 
 #### 1.0.5 - fix incorrect parsing when passing invalid (auto1111) syntax that has a float
 
 also fix test case for default swap parameters
 
-#### 1.0.4 - fix embeddings for empty swap target (eg `cat.swap("")`) when truncation is disabled 
+#### 1.0.4 - fix embeddings for empty swap target (eg `cat.swap("")`) when truncation is disabled
 
 #### 1.0.3 - better defaults for .swap (https://github.com/damian0815/compel/issues/8)
 
@@ -343,19 +344,19 @@ also fix test case for default swap parameters
 
 #### 1.0.1 - fix for InvokeAI's `--free_gpu_mem` option
 
-### 1.0.0 - new downweighting algorithm 
+### 1.0.0 - new downweighting algorithm
 
 Downweighting now works by applying an attention mask to remove the downweighted tokens, rather than literally removing them from the sequence. This behaviour is the default, but the old behaviour can be re-enabled by passing `downweight_mode=DownweightMode.REMOVE` on init of the `Compel` instance.
 
-Formerly, downweighting a token worked by both multiplying the weighting of the token's embedding, and doing an inverse-weighted blend with a copy of the token sequence that had the downweighted tokens removed. The intuition is that as weight approaches zero, the tokens being downweighted should be actually removed from the sequence. However, removing the tokens resulted in the positioning of all downstream tokens becoming messed up. The blend ended up blending a lot more than just the tokens in question. 
+Formerly, downweighting a token worked by both multiplying the weighting of the token's embedding, and doing an inverse-weighted blend with a copy of the token sequence that had the downweighted tokens removed. The intuition is that as weight approaches zero, the tokens being downweighted should be actually removed from the sequence. However, removing the tokens resulted in the positioning of all downstream tokens becoming messed up. The blend ended up blending a lot more than just the tokens in question.
 
-As of v1.0.0, taking advice from @keturn and @bonlime (https://github.com/damian0815/compel/issues/7) the procedure is by default different. Downweighting still involves a blend but what is blended is a version of the token sequence with the downweighted tokens masked out, rather than removed. This correctly preserves positioning embeddings of the other tokens. 
+As of v1.0.0, taking advice from @keturn and @bonlime (https://github.com/damian0815/compel/issues/7) the procedure is by default different. Downweighting still involves a blend but what is blended is a version of the token sequence with the downweighted tokens masked out, rather than removed. This correctly preserves positioning embeddings of the other tokens.
 
 Also a bugfix: fix black images on weight 0 (https://github.com/invoke-ai/InvokeAI/issues/2832)
 
-### 0.1.10 - add support for prompts longer than the model's max token length. 
+### 0.1.10 - add support for prompts longer than the model's max token length.
 
-To enable, initialize `Compel` with `truncate_long_prompts=False` (default is True). Prompts that are longer than the model's `max_token_length` will be chunked and padded out to an integer multiple of `max_token_length`. 
+To enable, initialize `Compel` with `truncate_long_prompts=False` (default is True). Prompts that are longer than the model's `max_token_length` will be chunked and padded out to an integer multiple of `max_token_length`.
 
 Note that even if you don't use a negative prompt, you'll need to build a conditioning tensor for a negative prompt of at least `""`, and use `compel.pad_conditioning_tensors_to_same_length()`, otherwise the you'll get an error about mismatched conditioning tensor lengths:
 
